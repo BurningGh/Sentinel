@@ -22,7 +22,7 @@ import com.alibaba.csp.sentinel.context.Context;
  * @author jialiang.linjl
  */
 public class DefaultProcessorSlotChain extends ProcessorSlotChain {
-
+    // 头尾两个指针
     AbstractLinkedProcessorSlot<?> first = new AbstractLinkedProcessorSlot<Object>() {
 
         @Override

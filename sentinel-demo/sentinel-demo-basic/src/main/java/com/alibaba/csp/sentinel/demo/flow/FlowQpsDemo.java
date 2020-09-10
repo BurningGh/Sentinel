@@ -42,14 +42,16 @@ public class FlowQpsDemo {
 
     private static volatile boolean stop = false;
 
-    private static final int threadCount = 32;
+    private static final int threadCount = 2;
 
     private static int seconds = 60 + 40;
 
     public static void main(String[] args) throws Exception {
         initFlowQpsRule();
 
+        // 启动打印任务，输出当前
         tick();
+        // 模仿访问流量
         // first make the system run on a very low condition
         simulateTraffic();
 
@@ -67,6 +69,7 @@ public class FlowQpsDemo {
         rule1.setGrade(RuleConstant.FLOW_GRADE_QPS);
         rule1.setLimitApp("default");
         rules.add(rule1);
+        // dengwj3 将当前新的限流规则加载到sentinelProperties中，其中含有list<Rules>
         FlowRuleManager.loadRules(rules);
     }
 
@@ -138,19 +141,22 @@ public class FlowQpsDemo {
                 try {
                     entry = SphU.entry(KEY);
                     // token acquired, means pass
-                    pass.addAndGet(1);
+                    System.out.println("pass times "+pass.addAndGet(1));
+                    // 限流是抛出BlockException异常，其他不是限流异常
                 } catch (BlockException e1) {
-                    block.incrementAndGet();
+                    System.out.println("block times "+block.addAndGet(1));
                 } catch (Exception e2) {
                     // biz exception
                 } finally {
                     total.incrementAndGet();
                     if (entry != null) {
+                        // 结束对指定资源进入的访问并且恢复上下文的entry栈
                         entry.exit();
                     }
                 }
 
                 Random random2 = new Random();
+                System.out.println("");
                 try {
                     TimeUnit.MILLISECONDS.sleep(random2.nextInt(50));
                 } catch (InterruptedException e) {

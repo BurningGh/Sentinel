@@ -34,7 +34,7 @@ import com.alibaba.csp.sentinel.slots.block.Rule;
 
 /**
  * {@inheritDoc}
- *
+ * nd
  * @author jialiang.linjl
  * @author leyou(lihao)
  * @author Eric Zhao
@@ -124,6 +124,7 @@ public class CtSph implements Sph {
         }
 
         if (context == null) {
+            // 初始化一个默认的上下文，里面有个默认的entranceNode
             // Using default context.
             context = InternalContextUtil.internalEnter(Constants.CONTEXT_DEFAULT_NAME);
         }
@@ -143,6 +144,7 @@ public class CtSph implements Sph {
             return new CtEntry(resourceWrapper, null, context);
         }
 
+        // dengwj3 entry是一个含有上下文，slotchain和资源信息的树的节点
         Entry e = new CtEntry(resourceWrapper, chain, context);
         try {
             chain.entry(context, resourceWrapper, null, count, prioritized, args);
@@ -202,7 +204,9 @@ public class CtSph implements Sph {
                         return null;
                     }
 
+                    //根据spi初始化一个新的slotchain
                     chain = SlotChainProvider.newSlotChain();
+                    // 有voliatile修饰的map更新可以用新建map并put新的再+实现安全
                     Map<ResourceWrapper, ProcessorSlotChain> newMap = new HashMap<ResourceWrapper, ProcessorSlotChain>(
                         chainMap.size() + 1);
                     newMap.putAll(chainMap);
